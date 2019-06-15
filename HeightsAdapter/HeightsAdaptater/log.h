@@ -1,16 +1,19 @@
-#include <conio.h>
+//#include <conio.h>
 #include <iostream>
-#include <time.h>
+#include "date.h"
+#include <string_view>
+#include <fstream>
+#include <experimental/filesystem>
 
-char logAllFileName[] = "d:\\all.log";
-char logErrFileName[] = "d:\\err.log";
+constexpr std::string_view logAllFileName = "all.log";
+constexpr std::string_view logErrFileName = "err.log";
 
-enum LOGTYPE {
+enum class LOGTYPE {
 	ALL,
 	ERROR
 };
 
-void getDateTime( char* dateTime) {
+/*void getDateTime( char* dateTime) {
 	time_t rawtime;
 	struct tm * timeinfo;
 	time ( &rawtime );
@@ -21,9 +24,16 @@ void getDateTime( char* dateTime) {
 	dateTime[len-1] = ':';
 	dateTime[len] = ' ';
 	dateTime[len+1] = '\0';
-}
+}*/
 
-inline void writeLog(const char* logFileName, const char* dateTime, const char* msg) {
+inline void writeLog(std::string_view logFileName, std::string_view dateTime, std::string_view msg) {
+	namespace fs = std::experimental::filesystem;
+	auto path = fs::u8path(std::cbegin(logFileName), std::cend(logFileName));
+	std::ofstream fp{ path, std::ios::app /*| std::ios::binary*/ };
+	if (!fp)
+		throw std::runtime_error("Cannot open " + std::string{logFileName});
+	fp << dateTime << msg;
+	/*
 	FILE* fp;
 	errno_t err;
 	if( err = fopen_s( &fp, logAllFileName, "a+t") != 0 ) {
@@ -32,13 +42,17 @@ inline void writeLog(const char* logFileName, const char* dateTime, const char* 
 	}
 	fwrite( dateTime, sizeof(char), strlen(dateTime), fp);
 	fwrite( msg, sizeof(char), strlen(msg), fp);
-	fclose(fp);
+	fclose(fp);*/
 }
 
 void Log( const char* msg, LOGTYPE type = LOGTYPE::ALL ) {
 	std::cout << msg;
-	char currTime[32] = "";
-	getDateTime(currTime);
+	auto currTime = []() {
+		using namespace date;
+		std::ostringstream ss;
+		ss << std::chrono::system_clock::now() << ' ';
+		return ss.str();
+	}();
 	writeLog( logAllFileName, currTime, msg );
 	if( type == LOGTYPE::ERROR ) {
 		writeLog( logErrFileName, currTime, msg );

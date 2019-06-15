@@ -5,6 +5,8 @@
 #include <cmath>
 #include <stdlib.h>
 #include <string.h>
+#include <string_view>
+#include "tinyformat.h"
 
 struct HgtFormat {
 	int ncols;
@@ -24,8 +26,18 @@ struct HgtFormat {
 		return this->ncols * this->nrows;
 	}
 
-	static char* crdtodem(double lat, double lon, char* res)
+	static std::string crdtodem(double lat, double lon)
 	{
+		auto slat = lat >= 0
+			? tfm::format("N%.2d", (int)std::floor(std::abs(lat)))
+			: tfm::format("S%.2d", (int)std::ceil(std::abs(lat)));
+
+		auto slon = lon >= 0
+			? tfm::format("E%.3d", (int)std::floor(std::abs(lon)))
+			: tfm::format("W%.3d", (int)std::ceil(std::abs(lon)));
+
+		return tfm::format("%s%s", slat, slon);
+		/*
 		int lt, ll;
 		char slt[3], sll[4];
 		memset( res, 0, 11);
@@ -81,7 +93,7 @@ struct HgtFormat {
 		res[10] = 't';
 		res[11] = 0;
 		
-		return res;
+		return res;*/
 	}
 };
 

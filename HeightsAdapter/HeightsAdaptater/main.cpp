@@ -47,10 +47,13 @@ double DegTail(double deg) {
 
 void main(int argc, char* argv[])
 {
+	// https://github.com/HowardHinnant/date
+	// https://github.com/c42f/tinyformat
+
 	LogAll("Adatation is started\n");
 	LogAll("DEM files grid is creating...\n");
 	HgtFilesGrid demGrid;
-	demGrid.Init(4, "d:\\elevation\\");
+	demGrid.Init( 4, "elevation" );
 	LogAll("DEM files grid created.\n");
 
 	char destTilesPath[] = "G:\\earth3\\14\\";

@@ -9,10 +9,10 @@ public:
 	HgtFilesGrid();
 	~HgtFilesGrid();
 
-	void Init( int maxLoadedFiles, const char* filesPath );
+	void Init( int maxLoadedFiles, std::string_view filesPath);
 	signed short GetHeight( int iSquare, int jSquare, int i, int j );
 	bool IsExists(int i, int j);
-	const char* GetFileName( int i, int j );
+	std::string GetFileName( int i, int j );
 
 
 private:
@@ -26,13 +26,13 @@ private:
 
 	struct Heights {
 		signed short height[NRows][NCols];
-		FileFlag *pFileFlag;
+		FileFlag *pFileFlag = nullptr;
 	} *dataStack;
 
 	struct FileFlag {
-		char *fileName;
-		bool isLoaded;
-		Heights *pHeightData;
+		std::string fileName = "";
+		bool isLoaded = false;
+		Heights *pHeightData = nullptr;
 	} hgtFilesGrid[181][361];
 };
 
