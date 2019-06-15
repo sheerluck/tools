@@ -1,11 +1,12 @@
-#include <conio.h>
+//#include <conio.h>
 #include <iostream>
-#include <io.h>
-#include <direct.h>
+//#include <io.h>
+//#include <direct.h>
 #include "HgtFormat.h"
 #include "log.h"
 #include "vec3.h"
 #include "HgtFilesGrid.h"
+#include <experimental/filesystem>
 
 const double PI = 3.141592653589793238462;
 const double POLE = 20037508.34;
@@ -56,9 +57,11 @@ void main(int argc, char* argv[])
 	auto demGrid = std::make_unique<HgtFilesGrid>(4, "elevation");
 	LogAll("DEM files grid created.\n");
 	
-	std::string destTilesPath = "dest-earth3-14\\";
+	namespace fs = std::experimental::filesystem;
+	std::string destTilesPath = "dest-earth3-14";
 
 	LogAll("Preparing adaptation parameters...\n ");
+
 
 	constexpr int zoom = 14;
 	constexpr int quadSize = 129;//33
@@ -168,6 +171,19 @@ void main(int argc, char* argv[])
 
 
 				if (!isZeroHeight) {
+					auto subdir = tfm::format("%s/%d", destTilesPath, qm);
+					{
+						auto path = fs::u8path(std::cbegin(subdir), std::cend(subdir));
+						if (!fs::exists(subdir)) fs::create_directories(path);
+					}
+					auto fileName = tfm::format("%s/%s.ddm", subdir, qn);
+					auto path = fs::u8path(std::cbegin(fileName), std::cend(fileName));
+					std::ofstream fp{ path, std::ios::ate | std::ios::binary };
+					for (int i = 0; i < quadSize2; i++) {
+						fp << static_cast<float>(quadHeightData[i]);
+					}
+
+					/*
 					char ccn[10];
 					FILE *fp;
 					errno_t err;
@@ -191,7 +207,7 @@ void main(int argc, char* argv[])
 
 					fwrite(quadHeightData_fl, sizeof(float), quadSize2, fp);
 					delete[] quadHeightData_fl;
-					fclose(fp);
+					fclose(fp);*/
 				}
 
 			}
