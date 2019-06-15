@@ -94,7 +94,9 @@ signed short HgtFilesGrid::GetHeight( int iSquare, int jSquare, int i, int j )
 			//fread( buf, sizeof(short int), size, fp);
 			//fclose(fp);
 			for( int i=0; i < size; i++ ) {
-				signed short height = (signed short)((buf[i] & 255) << 8 | (buf[i] >> 8) & 255);
+				auto low = buf[i] & 255;
+				auto hi  = buf[i] >> 8;
+				signed short height = (signed short)(low << 8 | (hi & 255));
 				this->dataStack[this->loadedFiles].height[i / this->NRows][i % this->NCols] = height;
 			}
 			//delete[] buf;
