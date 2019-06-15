@@ -47,7 +47,7 @@ double DegTail(double deg) {
 	return (-1)*floor(deg) + deg;
 }
 
-void main(int argc, char* argv[])
+int main(int argc, char* argv[])
 {
 	// https://github.com/HowardHinnant/date
 	// https://github.com/c42f/tinyformat

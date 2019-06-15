@@ -1,7 +1,10 @@
 #include "HgtFilesGrid.h"
 #include "tinyformat.h"
 #include <iostream>
+#include <fstream>
 #include <experimental/filesystem>
+namespace fs = std::experimental::filesystem;
+
 
 HgtFilesGrid::HgtFilesGrid(int maxLoadedFiles, std::string_view filesPath)
 {
@@ -12,7 +15,6 @@ HgtFilesGrid::HgtFilesGrid(int maxLoadedFiles, std::string_view filesPath)
 	for (int i = 0; i <= 180; i++) {
 		for (int j = 0; j <= 360; j++) {
 			auto fileName = tfm::format("%s/%s.hgt", filesPath, HgtFormat::crdtodem(90 - i, -180 + j));
-			namespace fs = std::experimental::filesystem;
 			auto path = fs::u8path(std::cbegin(fileName), std::cend(fileName));
 			this->hgtFilesGrid[i][j].fileName = fs::exists(path) ? fileName : "";
 		}
@@ -67,11 +69,14 @@ signed short HgtFilesGrid::GetHeight( int iSquare, int jSquare, int i, int j )
 	else 
 	{
 		if( IsExists(iSquare, jSquare) ) {
+			/*
 			FILE *fp;
 			errno_t err;
 			if( err = fopen_s( &fp, this->hgtFilesGrid[iSquare][jSquare].fileName.c_str(), "rb+") != 0 ) {
 				return 0;
-			}
+			}*/
+			std::ifstream fp{ this->hgtFilesGrid[iSquare][jSquare].fileName.c_str(),
+			                  std::ios::in | std::ios::binary };
 
 			if( this->loadedFiles >= this->MAX_LOADED_FILES ) {
 				this->loadedFiles = 0;
@@ -81,14 +86,19 @@ signed short HgtFilesGrid::GetHeight( int iSquare, int jSquare, int i, int j )
 				this->dataStack[this->loadedFiles].pFileFlag->isLoaded = false;
 
 			int size = this->NCols * this->NRows;
-			short int *buf = new short int[size];
-			fread( buf, sizeof(short int), size, fp);
-			fclose(fp);
+			//short int *buf = new short int[size];
+			auto buf = std::vector<short int>{};
+			buf.reserve(size);
+			auto fsize = fp.tellg();
+			fp.seekg(0, std::ios::beg);
+			fp.read((char *)buf.data(), fsize);
+			//fread( buf, sizeof(short int), size, fp);
+			//fclose(fp);
 			for( int i=0; i < size; i++ ) {
 				signed short height = (signed short)((buf[i] & 255) << 8 | (buf[i] >> 8) & 255);
 				this->dataStack[this->loadedFiles].height[i / this->NRows][i % this->NCols] = height;
 			}
-			delete[] buf;
+			//delete[] buf;
 			this->hgtFilesGrid[iSquare][jSquare].pHeightData = &this->dataStack[this->loadedFiles];
 			this->dataStack[this->loadedFiles].pFileFlag = &this->hgtFilesGrid[iSquare][jSquare];
 			this->loadedFiles++;
