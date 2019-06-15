@@ -45,7 +45,7 @@ inline void writeLog(std::string_view logFileName, std::string_view dateTime, st
 	fclose(fp);*/
 }
 
-void Log( const char* msg, LOGTYPE type = LOGTYPE::ALL ) {
+void Log(std::string_view msg, LOGTYPE type = LOGTYPE::ALL ) {
 	std::cout << msg;
 	auto currTime = []() {
 		using namespace date;
@@ -59,10 +59,10 @@ void Log( const char* msg, LOGTYPE type = LOGTYPE::ALL ) {
 	}
 }
 
-inline void LogAll(const char* msg) {
+inline void LogAll(std::string_view msg) {
 	Log(msg);
 }
 
-inline void LogErr(const char* msg) {
+inline void LogErr(std::string_view msg) {
 	Log(msg, LOGTYPE::ERROR);
 }

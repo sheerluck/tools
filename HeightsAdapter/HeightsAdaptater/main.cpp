@@ -89,8 +89,8 @@ int main(int argc, char* argv[])
 	double coordi = 0, coordj = 0;
 
 	for (int qm = 0; qm < quadsCount; qm++) {
-		std::cout << qm << " ";
-		if (qm > 14759)
+		if (qm > 14759) {
+			LogAll(tfm::format("qm: %d\n", qm));
 			for (int qn = 0; qn < quadsCount; qn++)
 			{
 				bool isZeroHeight = true;
@@ -211,6 +211,7 @@ int main(int argc, char* argv[])
 				}
 
 			}
+		}
 	}
 
 	delete[] quadHeightData;
