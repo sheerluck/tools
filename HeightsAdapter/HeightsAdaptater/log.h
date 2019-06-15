@@ -3,7 +3,8 @@
 #include "date.h"
 #include <string_view>
 #include <fstream>
-#include <experimental/filesystem>
+#include <filesystem>
+namespace fs = std::filesystem;
 
 constexpr std::string_view logAllFileName = "all.log";
 constexpr std::string_view logErrFileName = "err.log";
@@ -27,7 +28,6 @@ enum class LOGTYPE {
 }*/
 
 inline void writeLog(std::string_view logFileName, std::string_view dateTime, std::string_view msg) {
-	namespace fs = std::experimental::filesystem;
 	auto path = fs::u8path(std::cbegin(logFileName), std::cend(logFileName));
 	std::ofstream fp{ path, std::ios::app /*| std::ios::binary*/ };
 	if (!fp)

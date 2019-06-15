@@ -6,7 +6,8 @@
 #include "log.h"
 #include "vec3.h"
 #include "HgtFilesGrid.h"
-#include <experimental/filesystem>
+#include <filesystem>
+namespace fs = std::filesystem;
 
 const double PI = 3.141592653589793238462;
 const double POLE = 20037508.34;
@@ -57,10 +58,9 @@ int main(int argc, char* argv[])
 	auto demGrid = std::make_unique<HgtFilesGrid>(4, "elevation");
 	LogAll("DEM files grid created.\n");
 	
-	namespace fs = std::experimental::filesystem;
 	std::string destTilesPath = "dest-earth3-14";
 
-	LogAll("Preparing adaptation parameters...\n ");
+	LogAll("Preparing adaptation parameters...\n");
 
 
 	constexpr int zoom = 14;

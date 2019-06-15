@@ -2,8 +2,8 @@
 #include "tinyformat.h"
 #include <iostream>
 #include <fstream>
-#include <experimental/filesystem>
-namespace fs = std::experimental::filesystem;
+#include <filesystem>
+namespace fs = std::filesystem;
 
 
 HgtFilesGrid::HgtFilesGrid(int maxLoadedFiles, std::string_view filesPath)
@@ -41,7 +41,6 @@ void HgtFilesGrid::Init(int maxLoadedFiles, std::string_view filesPath)
 	for (int i = 0; i <= 180; i++) {
 		for (int j = 0; j <= 360; j++) {
 			auto fileName = tfm::format("%s/%s.hgt", filesPath, HgtFormat::crdtodem(90 - i, -180 + j));
-			namespace fs = std::experimental::filesystem;
 			auto path = fs::u8path(std::cbegin(fileName), std::cend(fileName));
 			this->hgtFilesGrid[i][j].fileName = fs::exists(path) ? fileName : "";
 		}
