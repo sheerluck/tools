@@ -3,8 +3,9 @@
 #include <io.h>
 #include <direct.h>
 #include "HgtFormat.h"
-#include "log.h";
-#include "HgtFilesGrid.h";
+#include "log.h"
+#include "vec3.h"
+#include "HgtFilesGrid.h"
 
 const double PI = 3.141592653589793238462;
 const double POLE = 20037508.34;
@@ -52,18 +53,16 @@ void main(int argc, char* argv[])
 
 	LogAll("Adatation is started\n");
 	LogAll("DEM files grid is creating...\n");
-	HgtFilesGrid demGrid;
-	demGrid.Init( 4, "elevation" );
+	auto demGrid = std::make_unique<HgtFilesGrid>(4, "elevation");
 	LogAll("DEM files grid created.\n");
-
-	char destTilesPath[] = "G:\\earth3\\14\\";
+	
+	std::string destTilesPath = "dest-earth3-14\\";
 
 	LogAll("Preparing adaptation parameters...\n ");
 
-	int zoom = 14;
-	int quadSize = 129;//33
-	int quadsCount = pow(2, zoom); //(dstFieldSize - 1) / 32;
-
+	constexpr int zoom = 14;
+	constexpr int quadSize = 129;//33
+	const int quadsCount = static_cast<int>(std::pow(2, zoom)); //(dstFieldSize - 1) / 32;
 	const int dstFieldSize = quadsCount * (quadSize - 1) + 1;//524289;// = 2^19 + 1 > 1201 * 360 - (360 - 1)
 
 	HgtFormat srcHgtFormat(1201, 1201, 1.0 / 1200.0);// 3 / 3600 == 1 / ( 1201 - 1 ) deg.
@@ -111,9 +110,9 @@ void main(int argc, char* argv[])
 						int i00 = 1200 - 1 - indLat;
 						int j00 = (int)floor(onedlon / srcHgtFormat.cellsize);
 
-						vec_t h00 = demGrid.GetHeight(demFileIndex_i, demFileIndex_j, i00, j00);
-						vec_t h01 = demGrid.GetHeight(demFileIndex_i, demFileIndex_j, i00, j00 + 1);
-						vec_t h10 = demGrid.GetHeight(demFileIndex_i, demFileIndex_j, i00 + 1, j00);
+						vec_t h00 = demGrid->GetHeight(demFileIndex_i, demFileIndex_j, i00, j00);
+						vec_t h01 = demGrid->GetHeight(demFileIndex_i, demFileIndex_j, i00, j00 + 1);
+						vec_t h10 = demGrid->GetHeight(demFileIndex_i, demFileIndex_j, i00 + 1, j00);
 
 						vec_t cornerLat = 90 - demFileIndex_i;
 						vec_t cornerLon = -180 + demFileIndex_j;
@@ -133,6 +132,9 @@ void main(int argc, char* argv[])
 							i00 < srcHgtFormat.nrows - 1 ? h10 : h00,
 							cornerLat + indLat * srcHgtFormat.cellsize);
 
+						auto X = static_cast<int>(XYZ::X);
+						auto Y = static_cast<int>(XYZ::Y);
+						auto Z = static_cast<int>(XYZ::Z);
 						line[0][X] = line[1][X] = lon_d;
 						line[0][Z] = line[1][Z] = lat_d;
 
@@ -142,7 +144,7 @@ void main(int argc, char* argv[])
 
 						if (edge < 0.0)
 						{
-							h11 = demGrid.GetHeight(demFileIndex_i, demFileIndex_j, i00 + 1, j00 + 1);
+							h11 = demGrid->GetHeight(demFileIndex_i, demFileIndex_j, i00 + 1, j00 + 1);
 
 							vecSet(tr[0],
 								cornerLon + (j00 + 1) * srcHgtFormat.cellsize,
@@ -184,7 +186,7 @@ void main(int argc, char* argv[])
 
 					float* quadHeightData_fl = new float[quadSize2];
 					for (int i = 0; i < quadSize2; i++) {
-						quadHeightData_fl[i] = quadHeightData[i];
+						quadHeightData_fl[i] = static_cast<float>(quadHeightData[i]);
 					}
 
 					fwrite(quadHeightData_fl, sizeof(float), quadSize2, fp);
@@ -196,6 +198,6 @@ void main(int argc, char* argv[])
 	}
 
 	delete[] quadHeightData;
-
+	
 	LogAll("Adaptaion successfully complete.\n");
 }

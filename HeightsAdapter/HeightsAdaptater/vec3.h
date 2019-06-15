@@ -3,9 +3,11 @@
 
 #include <math.h>
 
-#define X 0
-#define Y 1
-#define Z 2
+enum class XYZ {
+	X = 0,
+	Y = 1,
+	Z = 2
+};
 
 typedef double vec_t;
 typedef vec_t vec3_t[3];

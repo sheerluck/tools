@@ -6,10 +6,10 @@
 class HgtFilesGrid
 {
 public:
-	HgtFilesGrid();
+	HgtFilesGrid(int maxLoadedFiles, std::string_view filesPath);
 	~HgtFilesGrid();
 
-	void Init( int maxLoadedFiles, std::string_view filesPath);
+	//void Init( int maxLoadedFiles, std::string_view filesPath);
 	signed short GetHeight( int iSquare, int jSquare, int i, int j );
 	bool IsExists(int i, int j);
 	std::string GetFileName( int i, int j );

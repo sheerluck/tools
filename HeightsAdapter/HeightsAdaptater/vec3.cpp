@@ -1,5 +1,11 @@
 #include "vec3.h"
 
+
+auto X = static_cast<int>(XYZ::X);
+auto Y = static_cast<int>(XYZ::Y);
+auto Z = static_cast<int>(XYZ::Z);
+
+
 void vecSet( vec3_t v, vec_t vx, vec_t vy, vec_t vz ){
 	v[X] = vx;
 	v[Y] = vy;

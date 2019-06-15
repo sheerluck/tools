@@ -3,17 +3,7 @@
 #include <iostream>
 #include <experimental/filesystem>
 
-HgtFilesGrid::HgtFilesGrid()
-{
-}
-
-
-HgtFilesGrid::~HgtFilesGrid()
-{
-	delete[] this->dataStack;
-}
-
-void HgtFilesGrid::Init(int maxLoadedFiles, std::string_view filesPath)
+HgtFilesGrid::HgtFilesGrid(int maxLoadedFiles, std::string_view filesPath)
 {
 	this->loadedFiles = 0;
 	this->MAX_LOADED_FILES = maxLoadedFiles;
@@ -21,7 +11,7 @@ void HgtFilesGrid::Init(int maxLoadedFiles, std::string_view filesPath)
 
 	for (int i = 0; i <= 180; i++) {
 		for (int j = 0; j <= 360; j++) {
-			auto fileName = tfm::format("%s%s.hgt", filesPath, HgtFormat::crdtodem(90 - i, -180 + j));
+			auto fileName = tfm::format("%s/%s.hgt", filesPath, HgtFormat::crdtodem(90 - i, -180 + j));
 			namespace fs = std::experimental::filesystem;
 			auto path = fs::u8path(std::cbegin(fileName), std::cend(fileName));
 			this->hgtFilesGrid[i][j].fileName = fs::exists(path) ? fileName : "";
@@ -32,6 +22,33 @@ void HgtFilesGrid::Init(int maxLoadedFiles, std::string_view filesPath)
 		this->hgtFilesGrid[i][360] = this->hgtFilesGrid[i][0];
 	}
 }
+
+
+HgtFilesGrid::~HgtFilesGrid()
+{
+	delete[] this->dataStack;
+}
+
+/*
+void HgtFilesGrid::Init(int maxLoadedFiles, std::string_view filesPath)
+{
+	this->loadedFiles = 0;
+	this->MAX_LOADED_FILES = maxLoadedFiles;
+	this->dataStack = new Heights[maxLoadedFiles];
+
+	for (int i = 0; i <= 180; i++) {
+		for (int j = 0; j <= 360; j++) {
+			auto fileName = tfm::format("%s/%s.hgt", filesPath, HgtFormat::crdtodem(90 - i, -180 + j));
+			namespace fs = std::experimental::filesystem;
+			auto path = fs::u8path(std::cbegin(fileName), std::cend(fileName));
+			this->hgtFilesGrid[i][j].fileName = fs::exists(path) ? fileName : "";
+		}
+	}
+
+	for (int i = 0; i <= 180; i++) {
+		this->hgtFilesGrid[i][360] = this->hgtFilesGrid[i][0];
+	}
+}*/
 
 bool HgtFilesGrid::IsExists(int i, int j){
 	return 0 != this->hgtFilesGrid[i][j].fileName.length();
